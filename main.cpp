@@ -29,9 +29,10 @@ int main() {
         int no=contacts->selectDataNo(current);
         if(no==0) continue;
         contacts->Delete(no);
+      
       } 
       if(menu==5) contacts->dateSort(current);
-      //if(menu==6);
+      if(menu==6) contacts->saveData(file_name, current);
     }
     
     
