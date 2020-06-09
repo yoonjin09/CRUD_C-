@@ -42,6 +42,7 @@ class Contact {
     void searchName(int count);
     void dateSort(int count);
     void Delete(int no);
+    void saveData(string,int);
 };
 
 #endif
