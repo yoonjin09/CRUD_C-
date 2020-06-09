@@ -190,3 +190,17 @@ int Contact::selectDataNo(int count){
 void Contact::Delete(int no){
   persons[no-1].date=-1;
 }
+
+void Contact::saveData(string filename, int count){
+  FILE*fp;
+  char ch[30];
+  strcpy(ch,filename.c_str());
+  Person c;
+  fp=fopen(ch,"wt");
+  for(int i=0; i< count;i++){
+    c=persons[i];
+    if(c.date!=-1){
+      fprintf(fp,"%s; %d%d%d;%s;%s\n", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+    }
+  }
+}
