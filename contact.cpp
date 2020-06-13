@@ -128,7 +128,7 @@ void Contact::print(int current){
    for(i=0; i<current; i++){
      c=persons[i];
      if(c.date!=-1){
-      printf("%d번 %s; %d %d %d;%s;%11s\n",i+1, c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      printf("%s; %d %d %d;%s;%11s\n",c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
      }
    }
 
@@ -158,7 +158,7 @@ void Contact::searchName(int count){
   cin.getline(search,64);
   for(int t=0; t<count; t++){
     c = persons[t];
-    if(strstr(c.name, search)) printf("\n%d번 %s; %d %d %d;%s;%11s",t+1, c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+    if(strstr(c.name, search)) printf("\n%s; %d %d %d;%s;%11s",c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
   }
 }
 
@@ -181,14 +181,31 @@ void Contact::dateSort(int count){
 
 int Contact::selectDataNo(int count){
   int no;
+  int nocount = count;
+  char dname[64];
+  Person c;
   Contact::print(count);
-  printf("삭제할 번호는(취소: 0)?: ");
-  cin>>no;
+  getchar();
+  cout<<"삭제하고 싶은 이름은?: ";
+  cin.getline(dname,64);
+  for(int t=0; t<count; t++){
+    c = persons[t];
+    if(strcmp(c.name, dname)==0) {
+      printf("\n%s 관련한 정보를 삭제 하겠습니다 \n",c.name);
+      no=t+1;
+      nocount--;
+    }
+  }
+  if(nocount == count) {
+    cout<<"일치하는 정보가 없습니다 \n 정확하게 입력하세요."<<endl;
+    no=0;
+  }
   return no;
 }
 
 void Contact::Delete(int no){
   persons[no-1].date=-1;
+  
 }
 
 void Contact::saveData(string filename, int count){
@@ -200,7 +217,22 @@ void Contact::saveData(string filename, int count){
   for(int i=0; i< count;i++){
     c=persons[i];
     if(c.date!=-1){
-      fprintf(fp,"%s; %d%d%d;%s;%s\n", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      if(c.dob.month>9 && c.dob.day>9){
+        fprintf(fp,"%s; %d%d%d;%s;%s", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      }
+      else if(c.dob.month>9 && c.dob.day<10){
+        fprintf(fp,"%s; %d%d0%d;%s;%s", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      }
+      else if(c.dob.month<10 && c.dob.day>9){
+        fprintf(fp,"%s; %d0%d%d;%s;%s", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      }
+      else if(c.dob.month<10 && c.dob.day<10){
+        fprintf(fp,"%s; %d0%d0%d;%s;%s", c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+      }
+      if(i!=count-1){
+        fprintf(fp,"\n");
+      }
     }
+    
   }
 }
