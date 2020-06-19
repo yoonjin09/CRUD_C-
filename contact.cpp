@@ -1,11 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <string>
-#include <fstream>
-#include <algorithm>
-#include <cctype>
 #include <iostream>
 #include "contact.h"
 
@@ -96,18 +90,28 @@ int Contact::Add(int cont_i){
   char lines[200]="";
   getchar();
   
+  cout<<"\n**추가**\n"<<endl;
   cout<<"이름을 입력하세요: ";
   cin.getline(aname,64);
 
-  cout<<"생일을 입력하세요";
+  cout<<"생일을 입력하세요(YYYYMMDD): ";
   cin>>adate;
+  if(strlen(adate)!=8){
+    cout<<"\n!!!!형식에 맞게 입력하세요!!!!"<<endl;
+    cout<<"!!!!취소되었습니다!!!!";
+    return cont_i;
+  } 
 
-  cout<<"이메일을 입력하세요";
+  cout<<"이메일을 입력하세요: ";
   cin>>aemail;
 
-  cout<<"전화번호을 입력하세요";
+  cout<<"전화번호을 입력하세요(-을 입력하세요): ";
   cin>>aphone;
-
+  if(strlen(aphone) != 13){
+    cout<<"\n!!!!형식에 맞게 입력하세요!!!!";
+    cout<<"!!!!취소되었습니다!!!!";
+    return cont_i;
+  }
 
   strcat(lines,aname);
   strcat(lines,"; ");
@@ -118,6 +122,7 @@ int Contact::Add(int cont_i){
   strcat(lines,aphone);
 
   persons[cont_i++]=str2contact(lines);
+  cout<<"\n저장이 완료되었습니다";
   return cont_i;
 }
 
@@ -138,7 +143,7 @@ int Contact::selectMenu(){
   int menu;
   printf("\n\n<Menu>\n");
   printf("1. Print\n");
-  printf("2. Insert\n");
+  printf("2. Add\n");
   printf("3. Retrieve\n");
   printf("4. Delete\n");
   printf("5. Sort\n");
@@ -162,31 +167,63 @@ void Contact::searchName(int count){
   }
 }
 
+void Contact::searchEmail(int count){
+  int scount=0;
+  char search[64];
+  Person c;
+  getchar();
+  cout<<"검색하고 싶은 이메일은?: ";
+  cin.getline(search,64);
+  for(int t=0; t<count; t++){
+    c = persons[t];
+    if(strstr(c.email, search)) printf("\n%s; %d %d %d;%s;%11s",c.name, c.dob.year, c.dob.month,c.dob.day,c.email,c.phone);
+  }
+}
 
-
-int compareVAL(const void *arg1, const void *arg2){
+int compareVAL_D(const void *arg1, const void *arg2){
   int v1;
   int v2;
   v1 = ((Person*)arg1)->date;
   v2 = ((Person*)arg2)->date;
 
-  if(v1>v2) return -1;
+  if(v1>v2) return 1;
   else if(v1 == v2) return 0;  
-  else return 1;
+  else return -1;
 }
 
 void Contact::dateSort(int count){
- qsort(persons,count, sizeof(Person),compareVAL); 
+ qsort(persons,count, sizeof(Person),compareVAL_D); 
 }
 
-int Contact::selectDataNo(int count){
+int compareVAL_N(const void *arg1, const void *arg2){
+  char v1[64];
+  char v2[64];
+  strcpy(v1,((Person*)arg1)->name);
+  strcpy(v2,((Person*)arg2)->name);
+
+  if(strcmp(v1,v2)>0) return 1;
+  else if(strcmp(v1,v2)==0) return 0;  
+  else return -1;
+}
+
+void Contact::nameSort(int count){
+ qsort(persons,count, sizeof(Person),compareVAL_N); 
+}
+
+int Contact::selectDataNo(){
+  int no;
+  cin>>no;
+  return no;
+}
+
+int Contact::selectDelete(int count){
   int no;
   int nocount = count;
   char dname[64];
   Person c;
   Contact::print(count);
   getchar();
-  cout<<"삭제하고 싶은 이름은?: ";
+  cout<<"\n삭제하고 싶은 이름은?: ";
   cin.getline(dname,64);
   for(int t=0; t<count; t++){
     c = persons[t];
@@ -203,9 +240,12 @@ int Contact::selectDataNo(int count){
   return no;
 }
 
-void Contact::Delete(int no){
-  persons[no-1].date=-1;
-  
+int Contact::Delete(int no, int count){
+  for(int t=no-1; t<count; t++){
+    persons[t]=persons[t+1];
+  } 
+  count--;
+  return count; 
 }
 
 void Contact::saveData(string filename, int count){
